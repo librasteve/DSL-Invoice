@@ -9,63 +9,58 @@ grammar Grammar {
     }
     rule  head-line { invoice  <id>                  }
     rule  info-line { | date   <date>
-                      | client <client=quoted>
-                      | tax    <tax-rate=number> '%' }
+                          | client <client=quoted>
+                          | tax    <tax-rate=number> '%' }
     rule  item-line { item     <description=quoted>
-                      hours    <hours=number>
-                      rate     <rate=number>         }
+                          hours    <hours=number>
+                          rate     <rate=number>         }
     token id        { <[A..Za..z0..9_\-]>+       }
     token date      { \d**4 '-' \d**2 '-' \d**2 }
     token number    { \d+ [ '.' \d+ ]?          }
     token quoted    { '"' <( <-["]>+ )> '"'     }
 }
 
-class Item {
-    has $.description; has $.hours; has $.rate;
-    method subtotal { $!hours * $!rate }
-}
+use Actionable; use Form;
 
-class Invoice {
-    has $.id; has $.date; has $.client; has $.tax-rate = 0;
+class Item does Actionable {
+    has ($.description, $.hours, $.rate);
+    method subtotal { $.hours * $.rate }
+}
+class Invoice does Actionable {
+    has ($.id, $.date, $.client, $.tax-rate = 0);
     has Item @.items;
-    method subtotal { @!items.map(*.subtotal).sum }
-    method tax      { $.subtotal * $!tax-rate }
-    method total    { $.subtotal + $.tax }
-    method label    { "Tax ({($!tax-rate * 100).Int}%)" }
-    method raku     { self.Str }
-    method Str {
-        qq:to/RENDER/.chomp
-        Invoice: $!id
-        Date:    $!date
-        Client:  $!client
 
-        { sprintf("%-30s %6s %8s %10s", "Description", "Hours", "Rate", "Subtotal") }
-        { "-" x 58 }
-        { @!items.map({ sprintf("%-30s %6.1f %8.2f %10.2f", .description, .hours, .rate, .subtotal) }).join("\n") }
-        { "-" x 58 }
-        { sprintf("%46s %10.2f", "Subtotal", $.subtotal) }
-        { sprintf("%46s %10.2f", $.label,    $.tax) }
-        { sprintf("%46s %10.2f", "Total",    $.total) }
-        RENDER
+    method subtotal { @.items.map(*.subtotal).sum }
+    method tax      { $.subtotal * $.tax-rate / 100 }
+    method total    { $.subtotal + $.tax }
+    method label    { "Tax ($!tax-rate%)" }
+
+    method raku     {
+        form( :interleave, q:to/INVOICE/,
+            Invoice: {<<<<<}
+            Date:    {<<<<<<<<}
+            Client:  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+
+            Description                      Hours     Rate   Subtotal
+            ----------------------------------------------------------
+            {[[[[[[[[[[[[[[[[[[[[[[[[[[[[}  {]]].}  {]]].[}   {]]]].[}
+            ----------------------------------------------------------
+                                                  {]]]]]]]}   {]]]].[}
+            INVOICE
+
+            $.id, $.date, $.client,
+            |[@.items.map(*."$_"()) for <description hours rate subtotal>],
+            ["Subtotal", $.label, "Total"],
+            [$.subtotal, $.tax,  $.total ],
+              );
     }
 }
-
 class Actions {
-    method info-line($/) {
-        make $<date>   ?? { date     => ~$<date> }
-          !! $<client> ?? { client   => ~$<client> }
-          !!              { tax-rate => (+$<tax-rate>) / 100 }
-    }
-    method item-line($/) {
-        make Item.new(description => ~$<description>,
-                      hours       => +$<hours>,
-                      rate        => +$<rate>)
-    }
     method TOP($/) {
-        my %info = $<info-line>.map(*.made.pairs).flat;
-        make Invoice.new(id    => ~$<head-line><id>,
-                         |%info,
-                         items => $<item-line>.map(*.made).Array);
+        my $inv = Invoice.action($<head-line>);
+        { $inv.action($_) } for $<info-line>;
+        { $inv.items.push(Item.action($_)) } for $<item-line>;
+        make $inv;
     }
 }
 
