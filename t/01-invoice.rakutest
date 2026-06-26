@@ -1,0 +1,34 @@
+use lib 'lib';
+use Test;
+use DSL::Invoice;
+
+my $EXAMPLE = q:to/END/;
+invoice INV-001
+  date 2026-04-29
+  client "Acme Corp"
+
+  item "Website redesign"  hours 10  rate 150
+  item "Hosting setup"     hours 2   rate 100
+
+  tax 8%
+END
+
+my $expected = q:to/END/;
+Invoice: INV-001
+Date:    2026-04-29
+Client:  Acme Corp
+
+Description                     Hours     Rate   Subtotal
+----------------------------------------------------------
+Website redesign                 10.0   150.00    1500.00
+Hosting setup                     2.0   100.00     200.00
+----------------------------------------------------------
+                                      Subtotal    1700.00
+                                      Tax (8%)     136.00
+                                         Total    1836.00
+END
+
+my $inv = parse($EXAMPLE);
+is ~$inv, $expected.chomp, 'invoice renders correctly';
+
+done-testing;

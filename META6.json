@@ -1,0 +1,26 @@
+{
+  "auth": "zef:librasteve",
+  "authors": [
+    "librasteve"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "A DSL for writing invoices in plain text",
+  "rakudoc": false,
+  "license": "Artistic-2.0",
+  "name": "DSL::Invoice",
+  "perl": "6.d",
+  "provides": {
+    "DSL::Invoice": "lib/DSL/Invoice.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "https://github.com/librasteve/DSL-Invoice.git",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}
