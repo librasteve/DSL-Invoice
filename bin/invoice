@@ -1,0 +1,7 @@
+#!/usr/bin/env raku
+
+use DSL::Invoice;
+
+sub MAIN(Str $file) {
+    say parse($file.IO.slurp);
+}

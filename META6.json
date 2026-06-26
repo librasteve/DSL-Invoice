@@ -12,6 +12,9 @@
   "license": "Artistic-2.0",
   "name": "DSL::Invoice",
   "perl": "6.d",
+  "bin": [
+    "bin/invoice"
+  ],
   "provides": {
     "DSL::Invoice": "lib/DSL/Invoice.rakumod"
   },
