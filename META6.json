@@ -16,7 +16,9 @@
     "bin/invoice"
   ],
   "provides": {
-    "DSL::Invoice": "lib/DSL/Invoice.rakumod"
+    "DSL::Invoice": "lib/DSL/Invoice.rakumod",
+    "DSL::Invoice::Grammar": "lib/DSL/Invoice/Grammar.rakumod",
+    "DSL::Invoice::Actions": "lib/DSL/Invoice/Actions.rakumod"
   },
   "resources": [
   ],
