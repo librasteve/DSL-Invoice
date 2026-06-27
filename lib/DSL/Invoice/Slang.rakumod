@@ -10,13 +10,12 @@ my role Grammar {
 my role Actions {
     method term:sym<invoice>(Mu $/) {
         my $text := 'invoice' ~ ~$<dsl>;
-
         if self.^name.starts-with('Raku::') {
             use experimental :rakuast;
             make RakuAST::Call::Name.new(
                 name => RakuAST::Name.from-identifier-parts('DSL', 'Invoice', 'parse'),
                 args => RakuAST::ArgList.new(
-                    RakuAST::Literal.from-value($text)
+                    RakuAST::StrLiteral.new($text)
                 )
             );
         }
