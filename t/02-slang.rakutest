@@ -1,0 +1,13 @@
+use lib 'lib';
+use Test;
+use DSL::Invoice::Slang;
+
+my $inv = invoice INV-001
+  date 2026-04-29
+  client "Acme Corp"
+  item "Website redesign" hours 10 rate 150
+  tax 8%;
+
+is $inv.^name, 'DSL::Invoice::Actions::Invoice', 'slang returns Invoice object';
+
+done-testing;

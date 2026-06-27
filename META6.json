@@ -6,6 +6,7 @@
   "build-depends": [
   ],
   "depends": [
+    "Slangify"
   ],
   "description": "A DSL for writing invoices in plain text",
   "rakudoc": false,
@@ -18,7 +19,8 @@
   "provides": {
     "DSL::Invoice": "lib/DSL/Invoice.rakumod",
     "DSL::Invoice::Grammar": "lib/DSL/Invoice/Grammar.rakumod",
-    "DSL::Invoice::Actions": "lib/DSL/Invoice/Actions.rakumod"
+    "DSL::Invoice::Actions": "lib/DSL/Invoice/Actions.rakumod",
+    "DSL::Invoice::Slang": "lib/DSL/Invoice/Slang.rakumod"
   },
   "resources": [
   ],
